@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests);
+    Message create(MessageCreateRequest messageCreateRequest);
     Message find(UUID messageId);
     List<Message> findAllByChannelId(UUID channelId);
     Message update(UUID messageId, MessageUpdateRequest request);

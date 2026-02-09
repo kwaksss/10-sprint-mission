@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
+    public Message create(MessageCreateRequest messageCreateRequest) {
         UUID channelId = messageCreateRequest.channelId();
         UUID authorId = messageCreateRequest.authorId();
 
@@ -38,17 +39,20 @@ public class BasicMessageService implements MessageService {
             throw new NoSuchElementException("Author with id " + authorId + " does not exist");
         }
 
-        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
-                .map(attachmentRequest -> {
-                    String fileName = attachmentRequest.fileName();
-                    String contentType = attachmentRequest.contentType();
-                    byte[] bytes = attachmentRequest.bytes();
-
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
-                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
-                    return createdBinaryContent.getId();
-                })
-                .toList();
+        List<UUID> attachmentIds =
+                Optional.ofNullable(messageCreateRequest.binaryContentCreateRequests())
+                        .orElse(List.of())
+                        .stream()
+                        .map(attachmentRequest -> {
+                            BinaryContent binaryContent = new BinaryContent(
+                                    attachmentRequest.fileName(),
+                                    (long) attachmentRequest.bytes().length,
+                                    attachmentRequest.contentType(),
+                                    attachmentRequest.bytes()
+                            );
+                            return binaryContentRepository.save(binaryContent).getId();
+                        })
+                        .toList();
 
         String content = messageCreateRequest.content();
         Message message = new Message(
