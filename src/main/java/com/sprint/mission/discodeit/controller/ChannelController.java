@@ -55,4 +55,10 @@ public class ChannelController {
         return channelService.findAllByUserId(userId);
     }
 
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseBody
+    public List<ChannelDto> getPrivateChannels(@RequestParam UUID userId){
+        return channelService.findAllByUserId(userId);
+    }
+
 }
