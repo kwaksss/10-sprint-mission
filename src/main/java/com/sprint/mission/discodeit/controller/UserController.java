@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -32,10 +33,10 @@ public class UserController {
         return userService.create(createRequest);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/findAll", method = RequestMethod.GET)
     @ResponseBody
-    public List<UserDto> findAllUser() {
-        return userService.findAll();
+    public ResponseEntity<List<UserDto>> findAllUser(Model model) {
+        return ResponseEntity.ok(userService.findAll());
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
