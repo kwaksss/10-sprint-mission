@@ -29,18 +29,18 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User create(UserCreateRequest userCreateRequest) {
         String username = userCreateRequest.username();
         String email = userCreateRequest.email();
 
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {//이메일 검증
             throw new IllegalArgumentException("User with email " + email + " already exists");
         }
-        if (userRepository.existsByUsername(username)) {
+        if (userRepository.existsByUsername(username)) {//사용자이름 검증
             throw new IllegalArgumentException("User with username " + username + " already exists");
         }
 
-        UUID nullableProfileId = optionalProfileCreateRequest
+        UUID nullableProfileId = userCreateRequest.optionalProfileCreateRequest()
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
@@ -77,7 +77,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
+    public User update(UUID userId, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
@@ -90,7 +90,7 @@ public class BasicUserService implements UserService {
             throw new IllegalArgumentException("User with username " + newUsername + " already exists");
         }
 
-        UUID nullableProfileId = optionalProfileCreateRequest
+        UUID nullableProfileId = userUpdateRequest.optionalProfileCreateRequest()
                 .map(profileRequest -> {
                     Optional.ofNullable(user.getProfileId())
                                     .ifPresent(binaryContentRepository::deleteById);
