@@ -51,14 +51,9 @@ public class ChannelController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseBody
-    public List<ChannelDto> getPublicChannels(@RequestParam UUID userId){
+    public List<ChannelDto> getChannels(@RequestParam UUID userId){
         return channelService.findAllByUserId(userId);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
-    public List<ChannelDto> getPrivateChannels(@RequestParam UUID userId){
-        return channelService.findAllByUserId(userId);
-    }
 
 }
